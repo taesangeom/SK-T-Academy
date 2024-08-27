@@ -1,0 +1,2517 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPqjHzMz4UpYd36LNxjTz3a",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/taesangeom/SK-T-Academy/blob/main/24.08.Python/02_pandas01.ipyn\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "LzO0d96XL_bh"
+      },
+      "outputs": [],
+      "source": [
+        "# pandas가 이제 앞으로 메인으로 데이터를 핸들링을 할 때 주로!!!\n",
+        "# 파이썬을 기반으로 만든 외부 패키지!!!!\n",
+        "# pandas도 기본적으로 자기가 필요한 자료형 : Series, DataFrame, Pannel\n",
+        "# ==> 1차원 자료를 처리할 자료형 : Series\n",
+        "#     2차원 자료를 처리할 자료형 : DataFrame\n",
+        "#     3차원 자료를 처리할 자료형 : Pannel\n",
+        "# ==> 내가 처리할 자료들이 어떤 차원의 자료형!!!!\n",
+        "#     일반적으로 주로 사용하는 것이 2d dataframe"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#1D를 표현하는 자료형 : Series 직접적으로 사용할 일 거의 없음"
+      ],
+      "metadata": {
+        "id": "iDTqgrBgM_zE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd"
+      ],
+      "metadata": {
+        "id": "4sCjrX5LNG_S"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 기본적으로 여러개의 값들을 다루는 자료형 중에 하나임!!!\n",
+        "# 쌩 파이썬의 대표 : 리스트/튜플/// set, Dict ,문자열,,,\n",
+        "# ==> upgrade : numpy의 array 자료형( 벡터연산이 되도록!!! )\n",
+        "# ==> upgrade : pandas\n",
+        "\n",
+        "# pandas를 개발한 사람들은 \"차원\"을 중심으로 여러 자료형!!!!\n",
+        "# 1차원 : 1차원 벡터 ==> Series Type\n",
+        "# 2차원 : 2차원 행렬 ==> DataFrame Type *** 자주 사용되는 것 **\n",
+        "# 3차원 : 3차원 텐서 ==> Pannel Type\n",
+        "# 그 이상의 고차원은 안 함!!!!\n",
+        "# 그 이상의 고차원은 Tensor 쓸거니까 DL 쪽에서 할거임 / tf,pytorch\n",
+        "\n",
+        "# + 특징 : 인덱스를 내가 원하는 대로 만들 수 있음!!!\n",
+        "#          원하는 정보로 접근도 가능함!!!\n",
+        "#          ==> \"인덱스\" 내가 만든 것도 있고, \"인덱스\" 가 태생적인 정수쪽 인덱스도 존재\n",
+        "# pandas의 개발히스토리가\n",
+        "# 파이썬으로 금융 데이터 처리하고 싶어요!!!!!\n",
+        "# 언제, 얼마,\n",
+        "# 장이 안열리는 날도 있음...--> 날짜 중심의 데이터가 빵구..\n",
+        "# 2024-02-28\n",
+        "# 2024-03-02\n",
+        "# .....\n",
+        "# ? 그려면 2024-05-08의 데이터는 얼마?\n",
+        "list.index(값) --> list에서 위치 정보로 조회!!!\n",
+        "data[날짜]\n",
+        "# ==> 내가 원하는 정보를 바탕으로 값에 직접 접근하고 싶다!!!\n",
+        "#     순서 이외에 내가 원한느 정보를 바탕으로 접근하자!!!\n",
+        "#     (코드값, 날짜, 시간, 주민번호 등등등....)\n",
+        "# ==> 물론 단점도 있음 : 시간, 숫자, 텍스트,,,여러 자료형 다 처리\n",
+        "#                        속도가 상당히 느림!!!!\n",
+        "#                       ==> 적당항 사이즈의 데이터 핸들링에는 아주 편함!!!\n",
+        "# but) 큰 사이즈, 실시간 대용량 대응을 못 함!!!!!\n",
+        "#      ==> sql + gpu + spark etccccccccccccccc\n"
+      ],
+      "metadata": {
+        "id": "iUCF4dkbNLyD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 예) 삼성전자 주가 데이터를 처리하고 싶다!!!!\n",
+        "#     종가 1개만 생각하고\n",
+        "#     80000, 83000, 79000, 82000, ....\n",
+        "# ==> 1차원 가격들만 모아둘 수 있음!!!( 리스트, array etc)\n",
+        "\n",
+        "# 오늘 가격은 얼마? ==> -1\n",
+        "# 지난 주 화욜은 얼마? ??? 몇 번쨰인지 고민을 해야함!!!\n",
+        "# ===> 주말,,,,중간 공휴일,,,,\n",
+        "# ===> 몇 번째 데이터로 접근하기에 상당히 불편하다!!!!!!\n",
+        "# ===> 정수인덱스 말고,,\n",
+        "#      내가 원하는 인덱스로 종가 데이터를 접근할 경로를 만들자!!!\n",
+        "#      (날짜가 그 중에 하나 후보!!!)\n",
+        "\n",
+        "# 예) 주식 가격 데이터만 있다고 가정!!!\n",
+        "# 값 : 10000, 10300, 9900, 10500, 11000"
+      ],
+      "metadata": {
+        "id": "zK9LAAK3PUeb"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 생성1) 쌩 파이썬의 리스트\n",
+        "stock_price_list = [ 10000, 10300, 9900, 10500, 11000 ]\n",
+        "# 생성2) numpy --> array\n",
+        "stock_price_arr = np.array(stock_price_list)\n",
+        "# 생성3) pandas --> 1차원 --> Series 자료형을 생성 : S대문자..\n",
+        "stock_price_Series = pd.Series( stock_price_list )"
+      ],
+      "metadata": {
+        "id": "Q0PAwKe6SBiJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_arr"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "eKnk3vrQSusn",
+        "outputId": "d260dfc9-939d-4d59-db4e-025192914379"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([10000, 10300,  9900, 10500, 11000])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series  # 인덱스가 항상 따라다닌다."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        },
+        "id": "NDZ-YM4USxiu",
+        "outputId": "e3400595-fe2e-4667-a79a-b61a289d60ac"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0    10000\n",
+              "1    10300\n",
+              "2     9900\n",
+              "3    10500\n",
+              "4    11000\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>9900</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>11000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 1번 주식 가격에 대한 접근\n",
+        "print( stock_price_list[0])\n",
+        "print( stock_price_arr[0])\n",
+        "print( stock_price_Series[0])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "X9TrOk5gS9f2",
+        "outputId": "c1bbe0f8-5a13-4161-8cfc-e74c49c76dc7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "10000\n",
+            "10000\n",
+            "10000\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 1번~3번 주식 가격에 대한 접근 : 슬라이싱\n",
+        "print( stock_price_list[0:4])\n",
+        "print( stock_price_arr[0:4])\n",
+        "print( stock_price_Series[0:4])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "W9I1BkWOTIDu",
+        "outputId": "12f97363-357c-48b0-eb5e-f139885a194c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[10000, 10300, 9900, 10500]\n",
+            "[10000 10300  9900 10500]\n",
+            "0    10000\n",
+            "1    10300\n",
+            "2     9900\n",
+            "3    10500\n",
+            "dtype: int64\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_arr[[0,4]]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Bb-YPblPTY4X",
+        "outputId": "b6093623-c930-4b8e-daf8-e500303cdefb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([10000, 11000])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series[[0,4]]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 146
+        },
+        "id": "6Yqm7JGdTckO",
+        "outputId": "71e336cd-b39c-4867-99fd-2df89999b3e7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0    10000\n",
+              "4    11000\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>11000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# ==> 특별하게 나만의 인덱스를 지정하지 않으면,,\n",
+        "#     그냥 값들만 모아둔 친구라서,,태생적인 정수인덱스 기반만 가능!!!!\n",
+        "# +++ 내가 직접 인덱스를 만들자!!!!\n",
+        "# **** pandas는 꼭!!!! 인덱스를 달고 다닌다 *********"
+      ],
+      "metadata": {
+        "id": "OIYfuXqUTv3e"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index = pd.Series(\n",
+        "    # 정보 : 진짜 리얼한 데이터들,\n",
+        "    #        내가 원하는 값에 접근할 수 있는 인덱스!!!\n",
+        "    data = [10000, 10300, 9900, 10500, 11000],\n",
+        "    index = [\"2024-08-01\",\"2024-08-02\",\"2024-08-03\",\n",
+        "             \"2024-08-04\", \"2024-08-5\"]\n",
+        ")\n",
+        "stock_price_Series_index"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zEFMV_DyTwNu",
+        "outputId": "635acd12-84d2-42fd-9007-4aa35c88f069"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "<ipython-input-11-1fea36ba1fb7>:8: FutureWarning: Series.__getitem__ treating keys as positions is deprecated. In a future version, integer keys will always be treated as labels (consistent with DataFrame behavior). To access a value by position, use `ser.iloc[pos]`\n",
+            "  stock_price_Series_index[0]\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 11
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[0]  #경고, 정상적ㅇ니 방법 써라"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "m7RzPUwrUoy1",
+        "outputId": "a02ad133-deec-47a6-8c93-1ad6f54d2f4c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "<ipython-input-12-187cc0cbfeaf>:1: FutureWarning: Series.__getitem__ treating keys as positions is deprecated. In a future version, integer keys will always be treated as labels (consistent with DataFrame behavior). To access a value by position, use `ser.iloc[pos]`\n",
+            "  stock_price_Series_index[0]  #경고, 정상적ㅇ니 방법 써라\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[0:4]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 209
+        },
+        "id": "IDJ1Ms_mUtSV",
+        "outputId": "25a6255f-fdbe-49d0-8a22-15f2e6493638"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-01    10000\n",
+              "2024-08-02    10300\n",
+              "2024-08-03     9900\n",
+              "2024-08-04    10500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-01</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-03</th>\n",
+              "      <td>9900</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[\"2024-08-01\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "CoJNQtqcU02W",
+        "outputId": "327924f6-a6c9-4b15-c47e-62e5596a6609"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[\"2024-08-01\" : \"2024-08-04\"]\n",
+        "# 정수 인덱스로 슬라이싱 하면 -> 끝점 생략됨\n",
+        "# 하지만 !!!!!   내가 만든 인덱스로 슬라이싱 한다면 끝점이 포함됨"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 209
+        },
+        "id": "TOcSWKXGU6Td",
+        "outputId": "1cfae314-87a2-4216-8378-3e31744082a9"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-01    10000\n",
+              "2024-08-02    10300\n",
+              "2024-08-03     9900\n",
+              "2024-08-04    10500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-01</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-03</th>\n",
+              "      <td>9900</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 15
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[ [\"2024-08-02\",\"2024-08-04\"]]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 146
+        },
+        "id": "mb68h105VUK2",
+        "outputId": "f7b2ef19-26e2-4cb4-e697-ac2b9f0b645b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-02    10300\n",
+              "2024-08-04    10500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[ \"2024-08-05\"]  #에러 -> 정확한 키값 그대로 비교하므로 정확 매칭 필요"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 567
+        },
+        "id": "hgzRuSbCVXod",
+        "outputId": "e0c3ff41-9f0f-432b-ad80-24a2cad8f072"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "KeyError",
+          "evalue": "'2024-08-05'",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mKeyError\u001b[0m                                  Traceback (most recent call last)",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pandas/core/indexes/base.py\u001b[0m in \u001b[0;36mget_loc\u001b[0;34m(self, key)\u001b[0m\n\u001b[1;32m   3790\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 3791\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_engine\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget_loc\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcasted_key\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   3792\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mKeyError\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0merr\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32mindex.pyx\u001b[0m in \u001b[0;36mpandas._libs.index.IndexEngine.get_loc\u001b[0;34m()\u001b[0m\n",
+            "\u001b[0;32mindex.pyx\u001b[0m in \u001b[0;36mpandas._libs.index.IndexEngine.get_loc\u001b[0;34m()\u001b[0m\n",
+            "\u001b[0;32mpandas/_libs/hashtable_class_helper.pxi\u001b[0m in \u001b[0;36mpandas._libs.hashtable.PyObjectHashTable.get_item\u001b[0;34m()\u001b[0m\n",
+            "\u001b[0;32mpandas/_libs/hashtable_class_helper.pxi\u001b[0m in \u001b[0;36mpandas._libs.hashtable.PyObjectHashTable.get_item\u001b[0;34m()\u001b[0m\n",
+            "\u001b[0;31mKeyError\u001b[0m: '2024-08-05'",
+            "\nThe above exception was the direct cause of the following exception:\n",
+            "\u001b[0;31mKeyError\u001b[0m                                  Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-18-aad4815b4c10>\u001b[0m in \u001b[0;36m<cell line: 1>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mstock_price_Series_index\u001b[0m\u001b[0;34m[\u001b[0m \u001b[0;34m\"2024-08-05\"\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pandas/core/series.py\u001b[0m in \u001b[0;36m__getitem__\u001b[0;34m(self, key)\u001b[0m\n\u001b[1;32m   1038\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1039\u001b[0m         \u001b[0;32melif\u001b[0m \u001b[0mkey_is_scalar\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1040\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_get_value\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mkey\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1041\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1042\u001b[0m         \u001b[0;31m# Convert generator to list before going through hashable part\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pandas/core/series.py\u001b[0m in \u001b[0;36m_get_value\u001b[0;34m(self, label, takeable)\u001b[0m\n\u001b[1;32m   1154\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1155\u001b[0m         \u001b[0;31m# Similar to Index.get_value, but we do not fall back to positional\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1156\u001b[0;31m         \u001b[0mloc\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mindex\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget_loc\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlabel\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1157\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1158\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mis_integer\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mloc\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/pandas/core/indexes/base.py\u001b[0m in \u001b[0;36mget_loc\u001b[0;34m(self, key)\u001b[0m\n\u001b[1;32m   3796\u001b[0m             ):\n\u001b[1;32m   3797\u001b[0m                 \u001b[0;32mraise\u001b[0m \u001b[0mInvalidIndexError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mkey\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 3798\u001b[0;31m             \u001b[0;32mraise\u001b[0m \u001b[0mKeyError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mkey\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0merr\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   3799\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mTypeError\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   3800\u001b[0m             \u001b[0;31m# If we have a listlike key, _check_indexing_error will raise\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mKeyError\u001b[0m: '2024-08-05'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# numpy에서 하는게 다 됨!!!!!\n",
+        "# ==> 불리언 인덱싱!!!!! ==> 조건 필터링!!!!!!!!\n",
+        "# 여기서도 불리언 인덱싱이 가능함!!!\n",
+        "# ex) 주식 가격이 10000원이 넘는 데이터만 추려서 보자.\n"
+      ],
+      "metadata": {
+        "id": "EKJUKHcOWPzk"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[stock_price_Series_index > 10000]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 178
+        },
+        "id": "tInjZEnNWVfs",
+        "outputId": "9b5ab128-1780-49ac-a9f8-9081e32554d3"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-02    10300\n",
+              "2024-08-04    10500\n",
+              "2024-08-5     11000\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-5</th>\n",
+              "      <td>11000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 19
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index.index"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vmfhbF_pW_t8",
+        "outputId": "1a218ecf-41d7-4540-bcc7-08a9560e2bae"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Index(['2024-08-01', '2024-08-02', '2024-08-03', '2024-08-04', '2024-08-5'], dtype='object')"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index.values"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "IuLxH_fSXDSc",
+        "outputId": "ed0326d8-7c43-4ec9-c5c0-cb81d61225bb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([10000, 10300,  9900, 10500, 11000])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 21
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index + 100"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        },
+        "id": "9D3XKwIzXF4k",
+        "outputId": "83fb79f4-58cd-44db-bfab-2bca4c43325e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-01    10100\n",
+              "2024-08-02    10400\n",
+              "2024-08-03    10000\n",
+              "2024-08-04    10600\n",
+              "2024-08-5     11100\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-01</th>\n",
+              "      <td>10100</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10400</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-03</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10600</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-5</th>\n",
+              "      <td>11100</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#pandas는 인덱스 와 밸류 중심이다. + numpy의 특징 다 흡수\n",
+        "# 참고 : in 자료형이 파이썬의 dict -> key 중심 체크\n",
+        "# list -> value 중심 체크\n",
+        "# pandas -> index 중심 체크"
+      ],
+      "metadata": {
+        "id": "Cnzx2fRBXJUc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\"2024-08-01\" in stock_price_Series_index"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "FBXd1kQMbjbZ",
+        "outputId": "9eda1c3f-ff5c-4b70-b794-e2b3e31a3bac"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "10300 in stock_price_Series_index #인덱스 중심임"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "eGZOKSPLcDY_",
+        "outputId": "3881c4f2-52cc-4295-a890-6be18416b8d3"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "False"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "10300 in stock_price_Series_index.values"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "aZxFyYHPcKUY",
+        "outputId": "1959d817-88ef-4405-a0bb-fca188e10b81"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 25
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#파이썬의 dict -> pandas 유사함.\n",
+        "# 알아둘 사항 : 쌩 파이썬의 dict <---> pandas 유사함!!!\n",
+        "# ==> 데이터 수집에서 서로 상호호환이 가능함!!!!\n",
+        "# (뒤에 데이터 수집할 때 예로 볼 예정!!!!)\n",
+        "\n",
+        "s_data = {\"APPL\":1000, \"MS\":2000, \"TSLA\": 1500}\n",
+        "s_data"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "dvLqwqykcO75",
+        "outputId": "ee973926-5e59-40aa-9a2a-584c856736fb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'APPL': 1000, 'MS': 2000, 'TSLA': 1500}"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 26
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_data[\"APPL\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZZG5z5UFczOY",
+        "outputId": "d1665de1-76bc-473c-b3c1-38c7170ff941"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 27
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_data[0]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 145
+        },
+        "id": "QzBVepMwc1GI",
+        "outputId": "7c0e30fc-5f89-4458-a1dd-4c58c2db2378"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "KeyError",
+          "evalue": "0",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mKeyError\u001b[0m                                  Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-28-3ee0bb4fb7d0>\u001b[0m in \u001b[0;36m<cell line: 1>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0ms_data\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;31mKeyError\u001b[0m: 0"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_data_Series = pd.Series( s_data) # 처음 딕셔너리로 처리하고, 맨 마지막에만 시리즈로 감싸기\n",
+        "s_data_Series"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 178
+        },
+        "id": "B876fI4sc11I",
+        "outputId": "18a6d2a2-ef30-4f94-d234-d7e374a4737b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "APPL    1000\n",
+              "MS      2000\n",
+              "TSLA    1500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>1000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>2000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TSLA</th>\n",
+              "      <td>1500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 29
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_data_Series[\"APPL\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "nYYMmoHQc6p4",
+        "outputId": "4ad0f7e1-57f3-4cc4-886f-7f1564cd3769"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 30
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_data_Series[0]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "a7xY20-AdF24",
+        "outputId": "86327537-72ec-4918-91ba-8f43cb3a23eb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "<ipython-input-31-5ed2c8b0f14b>:1: FutureWarning: Series.__getitem__ treating keys as positions is deprecated. In a future version, integer keys will always be treated as labels (consistent with DataFrame behavior). To access a value by position, use `ser.iloc[pos]`\n",
+            "  s_data_Series[0]\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 31
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_data = {\"APPL\":1000, \"MS\":2000, \"TSLA\": 1500}\n",
+        "ticker = [\"GOOGLE\", \"APPL\", \"MS\",\"META\"]\n",
+        "s_2 = pd.Series(s_data, index = ticker )\n",
+        "s_2  # 테슬라가 없어짐 -> 판다스는 인덱스가 중심이기 때문에 -> 따라서 데이터에 새로 주어진 테슬라 인덱스가 없기 때문에 제외함"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 209
+        },
+        "id": "n_SnLu3ZdHpB",
+        "outputId": "5ec7bf2b-b01d-43be-da8e-bd1b47aab0e0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "GOOGLE       NaN\n",
+              "APPL      1000.0\n",
+              "MS        2000.0\n",
+              "META         NaN\n",
+              "dtype: float64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>GOOGLE</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>1000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>2000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>META</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> float64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 32
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# ==> 결측치에 대한 발생을 늘 염두해야 함!!!\n",
+        "#     why??? 결측치 생긴다고 경고나 에러가 없음!!!!!\n",
+        "# ==> pandas : NaN\n",
+        "#     mysql  : null --> is null. is not null"
+      ],
+      "metadata": {
+        "id": "4_fjDveGdxEf"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_1 = pd.Series(s_data)\n",
+        "s_1"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 178
+        },
+        "id": "C1I2jZbPeKSf",
+        "outputId": "15707d48-fda7-4913-bb5a-248200874e9d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "APPL    1000\n",
+              "MS      2000\n",
+              "TSLA    1500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>1000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>2000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TSLA</th>\n",
+              "      <td>1500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 33
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "s_1+s_2  # 인덱스가 양쪽에 있더라도 value가 한쪽 부분에만 있었다면 결측값 출력 -> NaN + 수 = NaN\n",
+        "# numpy의 기본적인 벡터연산의 특징\n",
+        "# 단순 순서 중심이 아니라 인덱스 중심의 벡터 연산\n",
+        "# 판다스는 인덱스에 대해서는 대충 or 하기 처리하는 경우들이 존재\n",
+        "# 원하지 않은 가로줄이 생성될수도 있음 -> 데이터의 수 자주 체크 필요"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        },
+        "id": "0CfMkwpNeS5H",
+        "outputId": "f3ab4cf5-e2be-4559-f5fd-faa4ed49206e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "APPL      2000.0\n",
+              "GOOGLE       NaN\n",
+              "META         NaN\n",
+              "MS        4000.0\n",
+              "TSLA         NaN\n",
+              "dtype: float64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>2000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>GOOGLE</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>META</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>4000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TSLA</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> float64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 34
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 참고) 결측치 데이터에 대한 처리!!!\n",
+        "# --> 자주 사용되는 메서드\n",
+        "#     .isnull() : 너 값이 결측값이냐? --> T/F\n",
+        "#     .notnull() :너 값이 정상값이냐 -> T/F"
+      ],
+      "metadata": {
+        "id": "7vpzhQ7TfFXe"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "temp=s_1+s_2\n",
+        "temp"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        },
+        "id": "jyI6IzqjfMRv",
+        "outputId": "56647f34-3642-4e92-aa4a-8c9ad0ce693f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "APPL      2000.0\n",
+              "GOOGLE       NaN\n",
+              "META         NaN\n",
+              "MS        4000.0\n",
+              "TSLA         NaN\n",
+              "dtype: float64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>2000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>GOOGLE</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>META</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>4000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TSLA</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> float64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 35
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "temp.isnull()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        },
+        "id": "oJkUJO43fQis",
+        "outputId": "ae73a17b-0037-4113-91a5-cea44d9b73c4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "APPL      False\n",
+              "GOOGLE     True\n",
+              "META       True\n",
+              "MS        False\n",
+              "TSLA       True\n",
+              "dtype: bool"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>False</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>GOOGLE</th>\n",
+              "      <td>True</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>META</th>\n",
+              "      <td>True</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>False</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TSLA</th>\n",
+              "      <td>True</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> bool</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 36
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#실제 받은 데이터 중에서 결측치들만 체크\n",
+        "# -> 실제 빵구난 데이터들만 보자\n",
+        "temp[temp.isnull()]  # [인덱스 자리] 에 T/F 값이 오면 T인 데이터만 리턴하는 판다스의 성질"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 178
+        },
+        "id": "T2DK8HHjfT3X",
+        "outputId": "afce4c36-d1ae-4bc9-b37e-94974109a755"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "GOOGLE   NaN\n",
+              "META     NaN\n",
+              "TSLA     NaN\n",
+              "dtype: float64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>GOOGLE</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>META</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TSLA</th>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> float64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 37
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#정상적인 값들만 보자\n",
+        "temp[temp.notnull()]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 146
+        },
+        "id": "Xp_JUThwfjfV",
+        "outputId": "ec4e46b5-f19d-455a-a0bd-5a8f3749ae23"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "APPL    2000.0\n",
+              "MS      4000.0\n",
+              "dtype: float64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>APPL</th>\n",
+              "      <td>2000.0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MS</th>\n",
+              "      <td>4000.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> float64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 38
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 주의!!!!!!\n",
+        "# 위의 isnull(), notnull() 메서드들이 FM적으로 맞는 말이고,\n",
+        "#                                              맞는 기능!!!\n",
+        "# 실제 데이터를 처리하다가 보면,,,,이런 단순 기능으로 빠지는 애들이 있음..\n",
+        "# NaN이 아니라,,,\n",
+        "\"\"\n",
+        "None\n",
+        "# ==> 코드적인 부분만이 아니라,,실제 데이터를 보면서 작업을 해야함!!\n",
+        "#     결측데이터에 있어서,,,,,,,빈문자열, None, NaN 구별하면서!!1\n",
+        "\n",
+        "#주의 ********************  빈 문자열과 None 타입 잘 처리하기"
+      ],
+      "metadata": {
+        "id": "U662s-fJfpGe"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#기타\n",
+        "temp.ndim"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DAm0td2ngSM1",
+        "outputId": "1859086a-2bb0-4b14-ff51-ce0246fe4d35"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 42
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "temp.shape"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "IbiCEfqjgZUG",
+        "outputId": "e58b49b6-01d1-44a4-e10f-e08ea807b42d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(5,)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 43
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "len(temp)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "LPuv9kmsgbeO",
+        "outputId": "716e6db3-68ff-4c8d-9c29-31d1f55a120a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "5"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 44
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "temp.dtype"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jY1rCUHUgdAn",
+        "outputId": "205bedb5-5547-4a2c-f5cf-4052df17624e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "dtype('float64')"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 45
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### pandas에서 값에 대한 접근 방식 : FM적인 방법 #####"
+      ],
+      "metadata": {
+        "id": "VJTUypRmgpxu"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# 기존의 방식 : 인덱스 자리에 내가 원하는 것을 요청하자!!!\n",
+        "#               -> 정수, 슬라이싱, 리스트etc\n",
+        "#               + 내가 만든거, 내가 만든거로 슬라이싱, 내가 만든걸로 리스트,,\n",
+        "#               + 조건식 기반의 불리언 인덱싱(필터링)\n",
+        "# ==> 앞의 결론 : pandas[ 대충 던지면 된다!! ]\n",
+        "# 값들이 많은 경우에 있어서는 속도차이가 상당히 나요!!!\n",
+        "# ==> FM적인 방법을 사용해야 속도를 보장받을 수 있음!!\n",
+        "#     상당히 차이 남!!!"
+      ],
+      "metadata": {
+        "id": "HEikYJndgw1F"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# pandas는 FM적으로 명시적으로 접근하는 방법을 만들어 둠!!!\n",
+        "# 값에 대한 접근을 바라보는 관점 : 1개 값 접근 vs 여러개 값\n",
+        "#   1개 값에 접근  1) at  : 내가 만든 인덱스로 1개 값 접근!!!\n",
+        "#                  2) iat : 태생적인 정수인덱스1개 값 접근!!!!\n",
+        "#   여러개 값에 접근 1) loc : 내가 만든 인덱스로 여러개 값 접근!!\n",
+        "#                    2) iloc :태생적인 정수인덱스로 여러개 값 접근!!\n",
+        "\n",
+        "# 참고) 이 부분들은 계속 버전에 따라서 변경되고 있음!!!!\n",
+        "#      ==> 단순 구글링을 하면,,오래전 자료가 나와서 안 맞을 수 있음.!!\n",
+        "#      ==> 최근 문서 기준으로..\n",
+        "\n",
+        "# 결론!!!) 내가 만든 인덱스로 접근 vs 태생적인 정수값을 접근!!!\n",
+        "#        + 1개 값을 접근을 할 것인가 vs 여러개 값을 요청할 것인가!!!\n",
+        "\n",
+        "# 참고) 1개 값을 iloc , loc 로도 가능은 함! 다만 속도차이 나중에 발생가능함으로 FM대로 지켜서 하자."
+      ],
+      "metadata": {
+        "id": "CGxIhS3jhzaW"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        },
+        "id": "BsEk5ck1ixdV",
+        "outputId": "267e9bae-f324-45f7-9a6c-6895560fcd8c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-01    10000\n",
+              "2024-08-02    10300\n",
+              "2024-08-03     9900\n",
+              "2024-08-04    10500\n",
+              "2024-08-5     11000\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-01</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-03</th>\n",
+              "      <td>9900</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-5</th>\n",
+              "      <td>11000</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 46
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index[0] # 경고 -> 비공식적인 방법 -> 대용량 데이터라면 속도차이가 심할 것이다."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xXJYr9syi0Au",
+        "outputId": "f63c97c5-bdb3-4569-9d4f-325a6db7a7ed"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "<ipython-input-47-582ae4b44d1a>:1: FutureWarning: Series.__getitem__ treating keys as positions is deprecated. In a future version, integer keys will always be treated as labels (consistent with DataFrame behavior). To access a value by position, use `ser.iloc[pos]`\n",
+            "  stock_price_Series_index[0]\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 47
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# ex) 정수인덱스로 접근 & 0번째 1개 값 접근 : FM\n",
+        "stock_price_Series_index.iat[0]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TIjRrYari4Zk",
+        "outputId": "661407f5-f688-42ae-f4e5-2df75e94441b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 48
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# ex) 정수인덱스로 접근 & 0번째 1개 값 접근 : FM\n",
+        "stock_price_Series_index.at[\"2024-08-01\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "HXQcsp4KjXnc",
+        "outputId": "e59de6ec-9eea-4311-ae8f-d0dade06dd44"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 49
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index.iloc[0]\n",
+        "# 일반적으로 속도 : [0] >>iat[0]\n",
+        "#명확히 1개 값을 접근한다면 at/iat로 접근하세요"
+      ],
+      "metadata": {
+        "id": "l30TEqw1jcLU"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#2024년 8월 4일 주식 가격은 언제인가요\n",
+        "# 내가 만든 인덱스 1개 요청 -> at\n",
+        "stock_price_Series_index.at[\"2024-08-04\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "E1FqFFcEjn1v",
+        "outputId": "16ff37c7-ffda-4f9b-b95c-a28eef7fad1b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "10500"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 50
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#0번째부터 4번째의 날의 주식 데이터 보여줘\n",
+        "stock_price_Series_index.iloc[0:4]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 209
+        },
+        "id": "fqLfpGdhj-_E",
+        "outputId": "7044e239-141b-4f46-a053-02272ac27117"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-01    10000\n",
+              "2024-08-02    10300\n",
+              "2024-08-03     9900\n",
+              "2024-08-04    10500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-01</th>\n",
+              "      <td>10000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-03</th>\n",
+              "      <td>9900</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 51
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#2024년 8월 2일 부터 8월 4일까지 주가데이터 보여주세요\n",
+        "stock_price_Series_index.loc[\"2024-08-02\":\"2024-08-04\"]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 178
+        },
+        "id": "EDVV0_WGkTkj",
+        "outputId": "3032edce-9bbc-4e6b-8cf6-cce40515a2ce"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2024-08-02    10300\n",
+              "2024-08-03     9900\n",
+              "2024-08-04    10500\n",
+              "dtype: int64"
+            ],
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>0</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>2024-08-02</th>\n",
+              "      <td>10300</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-03</th>\n",
+              "      <td>9900</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2024-08-04</th>\n",
+              "      <td>10500</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div><br><label><b>dtype:</b> int64</label>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 52
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#  참고) 수치연산을 하는 numpy를 포함!!!--=> 간단한 연산을 내포"
+      ],
+      "metadata": {
+        "id": "oHJgFiCDkorb"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index.sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Z74PCs_tkyhL",
+        "outputId": "02ee2f5c-2390-4a6d-b7a9-44aaa1de7d65"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "51700"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 53
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index.count()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Dg9HjnHhk4Cz",
+        "outputId": "8c496a56-f827-4916-c2ab-4e677b1cb2e2"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "5"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 54
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stock_price_Series_index.max()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "f0P0zkyHk62M",
+        "outputId": "53352bf7-4c65-4f6e-bad5-cdfbe2c80e54"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "11000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 55
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "max(stock_price_Series_index)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sLMDUQ-Ok9Uj",
+        "outputId": "26d533c8-5f94-4f65-987b-fb38cdb00c53"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "11000"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 56
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#정리\n",
+        "# 쌩 파이썬의 리스트 --> numpy array ---> pandas Series\n",
+        "#                                             1D\n",
+        "#                                      index(정수,내가 만든거)\n",
+        "#                                           at/iat/loc/iloc\n",
+        "#                                      벡터연산기본!!(index중심)\n"
+      ],
+      "metadata": {
+        "id": "fJcN4_UJlBTz"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
