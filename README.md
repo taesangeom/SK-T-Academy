@@ -1,6 +1,6 @@
 ![SK](./24.08.Python/12.png) ![SK1](./24.08.Python/11.png)  
 
-# [ SK-T-Academy ] 
+# [ SK Planet ASAC T-Academy ] 
 ## SK planet T Academy Bigdata analysis Course (2024.08.07 ~ 2025.02.05)  09:00 ~ 18:00 OFFLINE+  
 
 
