@@ -1,4 +1,4 @@
-# [ SK-T-Academy ]
+# [ SK-T-Academy ] ![SK T 아카데미 로고](24.08.Python/스크린샷 2024-09-02 150213.png)
 ## SK planet T Academy Bigdata analysis Course (2024.08.07 ~ 2025.02.05)  09:00 ~ 18:00 OFFLINE+  
 
 
