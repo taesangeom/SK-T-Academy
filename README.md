@@ -19,4 +19,4 @@ Pyhton / Web Crawling -> SQL -> Data Structure / Algorithm -> EDA / Visualisatio
 Based on real business data & Mentoring from the enterprise expert  
 
 # Technical Stacks  
-Python , SQL , Apache Hadoop / Spark , Tableau , Django , Flask
+Python , SQL , Apache Hadoop / Spark , Tableau , Tensorflow, Pycaret, Optuna, 
